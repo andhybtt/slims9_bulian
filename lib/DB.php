@@ -126,7 +126,10 @@ class DB
             return new IMysqldump\Mysqldump($connection);
         }
         
-        return new IMysqldump\Mysqldump($connection->getConn());
+        $args = $connection->buildConnectionArgument();
+        $dumpSettings = function_exists('config') ? (config('database_backup.options') ?? []) : [];
+        // $args[0] = DSN string, $args[1] = username, $args[2] = password
+        return new IMysqldump\Mysqldump($args[0], $args[1] ?? '', $args[2] ?? '', $dumpSettings);
     }
 
     /**
