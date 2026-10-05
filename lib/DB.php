@@ -118,7 +118,15 @@ class DB
      */
     public static function backup()
     {
-        return new IMysqldump\Mysqldump(self::$connectionCollection->get('pdo_' . self::$connectionName));
+        $connection = self::$connectionCollection->get('pdo_' . self::$connectionName);
+        $reflector = new \ReflectionClass('Ifsnop\Mysqldump\Mysqldump');
+        $params = $reflector->getConstructor()->getParameters();
+        
+        if (isset($params[0]) && $params[0]->getType() && $params[0]->getType()->getName() === 'SLiMS\Connection') {
+            return new IMysqldump\Mysqldump($connection);
+        }
+        
+        return new IMysqldump\Mysqldump($connection->getConn());
     }
 
     /**
